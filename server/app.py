@@ -54,12 +54,28 @@ class Login(Resource):
 
         session['user_id'] = user.id
         return make_response(user.to_dict(), 200)
+    
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return make_response({'message': '204: No Content'}, 204)
+    
+
+class CheckSession(Resource):
+    def get(self):
+        user = User.query.filter(User.id == session.get('user_id')).first()
+        if user:
+            return make_response(user.to_dict(), 200)
+        else:
+            return make_response({}, 401)
 
 
 api.add_resource(ClearSession, '/clear')
 api.add_resource(IndexArticle, '/articles')
 api.add_resource(ShowArticle, '/articles/<int:id>')
 api.add_resource(Login, '/login')
+api.add_resource(Logout, '/logout')
+api.add_resource(CheckSession, '/check_session')
 
 
 if __name__ == '__main__':
